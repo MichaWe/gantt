@@ -784,6 +784,12 @@ export default class Gantt {
 
         $.on(this.$svg, 'mousedown', '.bar-wrapper, .handle', (e, element) => {
             const bar_wrapper = $.closest('.bar-wrapper', element);
+            parent_bar_id = bar_wrapper.getAttribute('data-id');
+            const parent_bar = this.get_bar(parent_bar_id);
+            if (parent_bar.is_draggable() === false) {
+                return;
+            }
+
             if (element.classList.contains('left')) {
                 is_resizing_left = true;
             } else if (element.classList.contains('right')) {
@@ -793,13 +799,9 @@ export default class Gantt {
             }
 
             bar_wrapper.classList.add('active');
-
             x_on_start = e.layerX;
             y_on_start = e.layerY;
-            console.log('Down at', x_on_start, y_on_start);
-            console.log(e);
 
-            parent_bar_id = bar_wrapper.getAttribute('data-id');
             const ids = [
                 parent_bar_id,
                 ...this.get_all_dependent_tasks(parent_bar_id)

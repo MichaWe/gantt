@@ -76,10 +76,13 @@ export default class Bar {
             class: 'bar-group',
             append_to: this.group
         });
-        this.handle_group = createSVG('g', {
-            class: 'handle-group',
-            append_to: this.group
-        });
+
+        if (this.is_draggable()) {
+            this.handle_group = createSVG('g', {
+                class: 'handle-group',
+                append_to: this.group
+            });
+        }
     }
 
     prepare_helpers() {
@@ -191,7 +194,7 @@ export default class Bar {
     }
 
     draw_resize_handles() {
-        if (this.invalid || this.period.disabled === true) return;
+        if (this.is_draggable() === false) return;
 
         const bar = this.$bar;
         const handle_width = 8;
@@ -240,7 +243,7 @@ export default class Bar {
     }
 
     bind() {
-        if (this.invalid || this.period.disabled === true) return;
+        if (this.invalid) return;
         this.setup_click_event();
     }
 
@@ -286,6 +289,8 @@ export default class Bar {
     }
 
     update_bar_position({ x = null, width = null }) {
+        if (this.invalid || this.period.disabled === true) return;
+
         const bar = this.$bar;
         if (x) {
             // get all x values of parent task
@@ -496,6 +501,17 @@ export default class Bar {
         for (let arrow of this.arrows) {
             arrow.update();
         }
+    }
+
+    is_draggable() {
+        return (
+            this.period.disabled !== true &&
+            this.invalid !== true &&
+            this.period.draggable !== false &&
+            this.task.header !== true &&
+            this.task === this.period &&
+            !this.task.periods
+        );
     }
 }
 
