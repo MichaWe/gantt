@@ -536,10 +536,13 @@ class Bar {
             class: 'bar-group',
             append_to: this.group
         });
-        this.handle_group = createSVG('g', {
-            class: 'handle-group',
-            append_to: this.group
-        });
+
+        if (this.is_draggable()) {
+            this.handle_group = createSVG('g', {
+                class: 'handle-group',
+                append_to: this.group
+            });
+        }
     }
 
     prepare_helpers() {
@@ -651,7 +654,7 @@ class Bar {
     }
 
     draw_resize_handles() {
-        if (this.invalid || this.period.disabled === true) return;
+        if (this.is_draggable() === false) return;
 
         const bar = this.$bar;
         const handle_width = 8;
@@ -700,7 +703,7 @@ class Bar {
     }
 
     bind() {
-        if (this.invalid || this.period.disabled === true) return;
+        if (this.invalid) return;
         this.setup_click_event();
     }
 
@@ -746,6 +749,8 @@ class Bar {
     }
 
     update_bar_position({ x = null, width = null }) {
+        if (this.invalid || this.period.disabled === true) return;
+
         const bar = this.$bar;
         if (x) {
             // get all x values of parent task
@@ -956,6 +961,17 @@ class Bar {
         for (let arrow of this.arrows) {
             arrow.update();
         }
+    }
+
+    is_draggable() {
+        return (
+            this.period.disabled !== true &&
+            this.invalid !== true &&
+            this.period.draggable !== false &&
+            this.task.header !== true &&
+            this.task === this.period &&
+            !this.task.periods
+        );
     }
 }
 
@@ -2003,6 +2019,12 @@ class Gantt {
 
         $.on(this.$svg, 'mousedown', '.bar-wrapper, .handle', (e, element) => {
             const bar_wrapper = $.closest('.bar-wrapper', element);
+            parent_bar_id = bar_wrapper.getAttribute('data-id');
+            const parent_bar = this.get_bar(parent_bar_id);
+            if (parent_bar.is_draggable() === false) {
+                return;
+            }
+
             if (element.classList.contains('left')) {
                 is_resizing_left = true;
             } else if (element.classList.contains('right')) {
@@ -2012,13 +2034,9 @@ class Gantt {
             }
 
             bar_wrapper.classList.add('active');
-
             x_on_start = e.layerX;
             y_on_start = e.layerY;
-            console.log('Down at', x_on_start, y_on_start);
-            console.log(e);
 
-            parent_bar_id = bar_wrapper.getAttribute('data-id');
             const ids = [
                 parent_bar_id,
                 ...this.get_all_dependent_tasks(parent_bar_id)
