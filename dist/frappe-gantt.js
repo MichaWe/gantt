@@ -1984,11 +1984,14 @@ class Gantt {
             'hour'
         );
 
-        parent_element.scrollLeft =
+        var scroll_left =
             hours_before_first_task /
                 this.options.step *
                 this.options.column_width -
             this.options.column_width;
+        setTimeout(() => {
+            parent_element.scrollLeft = scroll_left;
+        }, 500);
     }
 
     bind_grid_click() {

@@ -1,6 +1,6 @@
 {
   "name": "frappe-gantt-fbkw",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "A simple, modern, interactive gantt library for the web with additions for the film university babelsberg KONRAD WOLD",
   "main": "src/index.js",
   "scripts": {
