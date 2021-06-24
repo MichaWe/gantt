@@ -789,7 +789,7 @@ export default class Gantt {
             const bar_wrapper = $.closest('.bar-wrapper', element);
             parent_bar_id = bar_wrapper.getAttribute('data-id');
             const parent_bar = this.get_bar(parent_bar_id);
-            if (parent_bar.is_draggable() === false) {
+            if (parent_bar && parent_bar.is_draggable() === false) {
                 return;
             }
 
